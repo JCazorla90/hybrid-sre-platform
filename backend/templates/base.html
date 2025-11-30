@@ -24,12 +24,32 @@
     .pill { display:inline-block; padding:0.1rem 0.5rem; border-radius:999px; font-size:0.75rem; background:#1e293b; }
     pre { background:#020617; padding:0.6rem 0.8rem; border-radius:8px; overflow:auto; }
     h2, h3 { color:#ffdd57; }
-  </style>
+  
+    .header-top { display:flex; justify-content:space-between; align-items:center; gap:1.5rem; }
+    .header-nav a { margin-left:0.75rem; font-size:0.9rem; opacity:0.9; }
+    .header-nav a:first-child { margin-left:0; }
+    .header-nav a:hover { opacity:1; text-decoration:underline; }
+    .header-nav { display:flex; flex-wrap:wrap; align-items:center; }
+    @media (max-width: 768px) {
+      .header-top { flex-direction:column; align-items:flex-start; }
+      .header-nav { margin-top:0.5rem; }
+    }
+    \n  </style>
 </head>
 <body>
   <header>
-    <h1>Hybrid SRE Platform</h1>
-    <p>Panel de entornos SRE / SecOps híbridos – Autor: Jose Cazorla</p>
+    <div class="header-top">
+      <div>
+        <h1>Hybrid SRE Platform</h1>
+        <p>Panel de entornos SRE / SecOps híbridos – Autor: Jose Cazorla</p>
+      </div>
+      <nav class="header-nav">
+        <a href="{% url 'home' %}">Dashboard</a>
+        <a href="{% url 'cloudaccount_list' %}">Cuentas cloud</a>
+        <a href="{% url 'env_list' %}">Entornos</a>
+        <a href="{% url 'security_panel' %}">Seguridad</a>
+      </nav>
+    </div>
   </header>
   <main>
     {% block content %}{% endblock %}

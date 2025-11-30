@@ -1,0 +1,58 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Panel de seguridad</h2>
+  <p>
+    Esta vista agrupa de forma centralizada el acceso a los paneles de
+    <strong>Wazuh</strong>, <strong>ELK/Kibana</strong> y <strong>Grafana</strong>.
+    En un despliegue real, las URLs se pueden configurar vía
+    <code>settings.SECURITY_DASHBOARD_ENDPOINTS</code>.
+  </p>
+  <p class="meta">
+    Demo: por defecto apunta a servicios locales como los definidos en
+    <code>stacks/docker-compose-full</code>.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Dashboards conectados</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Servicio</th>
+        <th>Descripción</th>
+        <th>URL</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ep in endpoints %}
+      <tr>
+        <td>{{ ep.name }}</td>
+        <td>{{ ep.description }}</td>
+        <td><code>{{ ep.url }}</code></td>
+        <td>
+          <a class="btn" href="{{ ep.url }}" target="_blank" rel="noopener noreferrer">
+            Abrir dashboard
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>Cómo se conectaría en producción</h3>
+  <p>
+    En la aplicación real, este panel podría:
+  </p>
+  <ul>
+    <li>Leer la URL de Wazuh/ELK/Grafana por entorno o por cuenta cloud.</li>
+    <li>Aplicar <strong>single sign-on</strong> (SSO) o enlaces firmados.</li>
+    <li>Filtrar dashboards por etiquetas de entorno (prod, pre, dev, lab).</li>
+    <li>Abrir vistas específicas (por ejemplo, logs de un entorno concreto).</li>
+  </ul>
+</div>
+{% endblock %}

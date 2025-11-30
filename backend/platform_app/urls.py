@@ -7,6 +7,7 @@ from .views import (
     EnvironmentCreateView,
     EnvironmentDetailView,
     EnvironmentDeployView,
+    SecurityPanelView,
 )
 
 urlpatterns = [
@@ -17,4 +18,5 @@ urlpatterns = [
     path("environments/new/", EnvironmentCreateView.as_view(), name="env_new"),
     path("environments/<slug:slug>/", EnvironmentDetailView.as_view(), name="env_detail"),
     path("environments/<slug:slug>/deploy/", EnvironmentDeployView.as_view(), name="env_deploy"),
+    path("security/", SecurityPanelView.as_view(), name="security_panel"),
 ]
