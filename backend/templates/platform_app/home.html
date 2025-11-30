@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="card">
-  <h2>Resumen</h2>
-  <p>Desde aquí puedes gestionar cuentas cloud, entornos y lanzar despliegues.</p>
+  <h2>Dashboard</h2>
+  <p>Resumen rápido de entornos, cuentas y últimos despliegues.</p>
   <p>
     <a class="btn" href="{% url 'cloudaccount_list' %}">Cuentas cloud</a>
     <a class="btn" href="{% url 'env_list' %}">Entornos</a>
@@ -31,15 +31,22 @@
 </div>
 
 <div class="card">
-  <h3>Cuentas cloud</h3>
-  {% if accounts %}
-  <ul>
-    {% for a in accounts %}
-    <li>{{ a.get_provider_display }} – {{ a.name }} ({{ a.account_id }})</li>
+  <h3>Últimos despliegues</h3>
+  {% if deployments %}
+  <table>
+    <tr>
+      <th>Entorno</th><th>Estado</th><th>Fecha</th>
+    </tr>
+    {% for d in deployments %}
+    <tr>
+      <td><a href="{% url 'env_detail' slug=d.environment.slug %}">{{ d.environment.slug }}</a></td>
+      <td>{{ d.get_status_display }}</td>
+      <td>{{ d.created_at }}</td>
+    </tr>
     {% endfor %}
-  </ul>
+  </table>
   {% else %}
-  <p>No hay cuentas cloud aún.</p>
+  <p>Aún no se ha lanzado ningún despliegue.</p>
   {% endif %}
 </div>
 {% endblock %}

@@ -9,10 +9,11 @@ class HomeView(View):
     def get(self, request):
         envs = Environment.objects.all().order_by("-created_at")[:5]
         accounts = CloudAccount.objects.all().order_by("provider", "name")
+        deployments = DeploymentRun.objects.select_related("environment").order_by("-created_at")[:5]
         return render(
             request,
             "platform_app/home.html",
-            {"envs": envs, "accounts": accounts},
+            {"envs": envs, "accounts": accounts, "deployments": deployments},
         )
 
 
@@ -77,5 +78,6 @@ class EnvironmentDeployView(View):
     def post(self, request, slug):
         env = get_object_or_404(Environment, slug=slug)
         deploy = DeploymentRun.objects.create(environment=env)
+        # Sin colas de background para simplificar (en producción -> Celery)
         deploy_environment(deploy)
         return redirect("env_detail", slug=env.slug)

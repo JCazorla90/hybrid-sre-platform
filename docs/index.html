@@ -2,103 +2,212 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Hybrid SRE Platform – Demo</title>
+  <title>Hybrid SRE Platform – Demo UI</title>
   <link rel="stylesheet" href="css/style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-  <script src="js/mermaid-init.js"></script>
+  <script defer src="js/app-sim.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Hybrid SRE Platform</h1>
-    <p>Blueprint SRE / SecOps híbrido multi-cloud · Autor: Jose Cazorla</p>
+  <header class="app-header">
+    <div class="logo">
+      <span class="logo-mark">H</span>
+      <div class="logo-text">
+        <span class="logo-title">Hybrid SRE Platform</span>
+        <span class="logo-subtitle">Demo UI · Autor: Jose Cazorla</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="user-pill">SRE · admin@hybrid</span>
+    </div>
   </header>
-  <main>
-    <section>
-      <h2>Arquitectura global</h2>
-      <div class="mermaid">
-      graph LR
-        subgraph Users
-          U1[DevOps / SRE]
-          U2[SecOps]
-        end
 
-        subgraph Panel["Hybrid SRE Panel (Django)"]
-          UI[UI Web]
-          API[API REST]
-        end
+  <div class="app-shell">
+    <aside class="sidebar">
+      <nav>
+        <button class="nav-item active" data-view="dashboard">Dashboard</button>
+        <button class="nav-item" data-view="environments">Entornos</button>
+        <button class="nav-item" data-view="cloud-accounts">Cuentas cloud</button>
+        <button class="nav-item" data-view="deployments">Despliegues</button>
+      </nav>
+    </aside>
 
-        subgraph Infra["Infra / IaC"]
-          Scripts[scripts providers (AWS/Azure/GCP/VMware/Proxmox)]
-          K8s[Helmfile + Charts]
-        end
+    <main class="content">
+      <!-- Dashboard -->
+      <section id="view-dashboard" class="view active">
+        <div class="card">
+          <h2>Dashboard</h2>
+          <p>Resumen de estado de tus entornos híbridos y multi-cloud.</p>
+          <div class="grid-3">
+            <div class="mini-card">
+              <div class="mini-label">Entornos</div>
+              <div class="mini-value">4</div>
+              <div class="mini-desc">dev, pre, prod, lab</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-label">Cuentas cloud</div>
+              <div class="mini-value">3</div>
+              <div class="mini-desc">AWS, Azure, GCP</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-label">Último despliegue</div>
+              <div class="mini-value ok">Éxito</div>
+              <div class="mini-desc">prod-aws · hace 5 min</div>
+            </div>
+          </div>
+        </div>
 
-        subgraph Clouds["Providers"]
-          AWS[AWS]
-          AZ[Azure]
-          GCP[GCP]
-          VM[VMware]
-          PX[Proxmox]
-        end
+        <div class="card">
+          <h3>Entornos recientes</h3>
+          <table>
+            <tr>
+              <th>Nombre</th><th>Slug</th><th>Proveedor</th><th>Cluster</th><th>Estado</th>
+            </tr>
+            <tr>
+              <td><a href="#" class="link-env" data-env="prod-aws">Producción AWS</a></td>
+              <td>prod-aws</td>
+              <td>AWS</td>
+              <td>EKS gestionado</td>
+              <td><span class="pill pill-ok">Healthy</span></td>
+            </tr>
+            <tr>
+              <td><a href="#" class="link-env" data-env="pre-azure">Preproducción Azure</a></td>
+              <td>pre-azure</td>
+              <td>Azure</td>
+              <td>AKS gestionado</td>
+              <td><span class="pill pill-ok">Healthy</span></td>
+            </tr>
+            <tr>
+              <td><a href="#" class="link-env" data-env="lab-kind">Lab on-prem</a></td>
+              <td>lab-kind</td>
+              <td>Local</td>
+              <td>kind (3 nodos)</td>
+              <td><span class="pill pill-warn">Cambios recientes</span></td>
+            </tr>
+          </table>
+        </div>
+      </section>
 
-        U1 --> UI
-        U2 --> UI
-        UI --> API
-        API --> Infra
-        Infra --> Clouds
-      </div>
-    </section>
+      <!-- Entornos -->
+      <section id="view-environments" class="view">
+        <div class="card">
+          <h2>Entornos</h2>
+          <p>Simulación de cómo se ve el listado de entornos en la aplicación real.</p>
+          <table>
+            <tr>
+              <th>Nombre</th><th>Slug</th><th>Proveedor</th><th>Cluster</th><th>Retención logs</th><th>Acciones</th>
+            </tr>
+            <tr>
+              <td>Producción AWS</td>
+              <td>prod-aws</td>
+              <td>AWS</td>
+              <td>EKS (3 AZs)</td>
+              <td>30 días</td>
+              <td><button class="btn-primary btn-small" data-env="prod-aws">Ver detalle</button></td>
+            </tr>
+            <tr>
+              <td>Preproducción Azure</td>
+              <td>pre-azure</td>
+              <td>Azure</td>
+              <td>AKS</td>
+              <td>15 días</td>
+              <td><button class="btn-primary btn-small" data-env="pre-azure">Ver detalle</button></td>
+            </tr>
+            <tr>
+              <td>Desarrollo GCP</td>
+              <td>dev-gcp</td>
+              <td>GCP</td>
+              <td>GKE</td>
+              <td>7 días</td>
+              <td><button class="btn-primary btn-small" data-env="dev-gcp">Ver detalle</button></td>
+            </tr>
+            <tr>
+              <td>Lab on-prem</td>
+              <td>lab-kind</td>
+              <td>Local</td>
+              <td>kind</td>
+              <td>7 días</td>
+              <td><button class="btn-primary btn-small" data-env="lab-kind">Ver detalle</button></td>
+            </tr>
+          </table>
+        </div>
 
-    <section>
-      <h2>Flujo CI/CD GitOps</h2>
-      <div class="mermaid">
-      sequenceDiagram
-        participant Dev as Dev
-        participant GH as GitHub
-        participant CI as GitHub Actions
-        participant AR as ArgoCD
-        participant K8 as Cluster K8s
+        <div class="card" id="env-detail-sim">
+          <h3>Detalle de entorno (simulado)</h3>
+          <p>Selecciona un entorno en la tabla para ver su configuración simulada.</p>
+          <div class="env-detail-body hidden">
+            <p><strong>Entorno:</strong> <span id="env-name"></span> (<code id="env-slug"></code>)</p>
+            <p><strong>Proveedor:</strong> <span id="env-provider"></span> · <strong>Cluster:</strong> <span id="env-cluster"></span></p>
+            <p><strong>Componentes:</strong> <span id="env-components"></span></p>
+            <h4>Despliegues recientes</h4>
+            <ul id="env-deployments"></ul>
+          </div>
+        </div>
+      </section>
 
-        Dev->>GH: Push código
-        GH-->>CI: Dispara CI
-        CI->>CI: Tests + build imagen
-        CI->>GH: Actualiza manifests (tag imagen)
-        AR->>GH: Detecta cambios en manifests
-        AR->>K8: Sincroniza recursos
-        K8-->>AR: Estado despliegue
-      </div>
-    </section>
+      <!-- Cuentas cloud -->
+      <section id="view-cloud-accounts" class="view">
+        <div class="card">
+          <h2>Cuentas cloud</h2>
+          <p>Representación de cómo se gestionan las cuentas cloud en el panel.</p>
+          <table>
+            <tr>
+              <th>Nombre</th><th>Proveedor</th><th>Account/ID</th><th>Región por defecto</th>
+            </tr>
+            <tr>
+              <td>aws-prod</td>
+              <td>AWS</td>
+              <td>123456789012</td>
+              <td>eu-west-1</td>
+            </tr>
+            <tr>
+              <td>azure-main</td>
+              <td>Azure</td>
+              <td>xxxx-azure-subscription-id</td>
+              <td>westeurope</td>
+            </tr>
+            <tr>
+              <td>gcp-dev</td>
+              <td>GCP</td>
+              <td>project-id-dev</td>
+              <td>europe-west1</td>
+            </tr>
+          </table>
+        </div>
+      </section>
 
-    <section>
-      <h2>Características clave</h2>
-      <ul>
-        <li>Panel web para definir entornos y cuentas cloud.</li>
-        <li>Integración con múltiples proveedores: AWS / Azure / GCP / VMware / Proxmox.</li>
-        <li>Despliegue de:
-          <ul>
-            <li>Prometheus + Grafana</li>
-            <li>Apache SkyWalking (extensible)</li>
-            <li>ELK / OpenSearch</li>
-            <li>Wazuh (extensible)</li>
-            <li>ArgoCD</li>
-          </ul>
-        </li>
-        <li>Etiquetado de recursos por entorno, proveedor y cuenta.</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>Cómo arrancar el panel</h2>
-      <pre><code>git clone https://github.com/TU-USUARIO/hybrid-sre-platform.git
-cd hybrid-sre-platform
-cp .env.example .env
-docker compose up -d --build
-
-# Panel: http://localhost:8000
-</code></pre>
-    </section>
-  </main>
-  <footer>
-    <p>Hybrid SRE Platform · Autor: Jose Cazorla</p>
-  </footer>
+      <!-- Despliegues -->
+      <section id="view-deployments" class="view">
+        <div class="card">
+          <h2>Histórico de despliegues</h2>
+          <p>Lista simulada de ejecuciones como se vería en la UI real.</p>
+          <table>
+            <tr>
+              <th>Entorno</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Log (resumen)</th>
+            </tr>
+            <tr>
+              <td>prod-aws</td>
+              <td><span class="pill pill-ok">Éxito</span></td>
+              <td>2025-11-30 10:02</td>
+              <td>2025-11-30 10:05</td>
+              <td><code>[+] Configs generadas · helmfile sync OK</code></td>
+            </tr>
+            <tr>
+              <td>pre-azure</td>
+              <td><span class="pill pill-ok">Éxito</span></td>
+              <td>2025-11-29 18:20</td>
+              <td>2025-11-29 18:23</td>
+              <td><code>AKS actualizado · Prometheus/Grafana/ELK up</code></td>
+            </tr>
+            <tr>
+              <td>lab-kind</td>
+              <td><span class="pill pill-warn">Fallo</span></td>
+              <td>2025-11-29 12:10</td>
+              <td>2025-11-29 12:11</td>
+              <td><code>kind cluster no accesible · timeout helmfile</code></td>
+            </tr>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>

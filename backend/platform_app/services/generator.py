@@ -17,17 +17,22 @@ def _env_labels(env: Environment):
 
 
 def generate_environment_configs(env: Environment) -> Path:
-    # Genera ficheros de valores para Helm basados en la config del entorno.
+    """
+    Genera ficheros de valores para Helm basados en la configuración del entorno,
+    incluyendo etiquetado de recursos.
+    """
     env_dir = K8S_DIR / "environments" / env.slug
     env_dir.mkdir(parents=True, exist_ok=True)
 
     labels = _env_labels(env)
 
+    # Prometheus (kube-prometheus-stack)
     if env.enable_prometheus:
         prom_values = {
             "prometheus": {
                 "prometheusSpec": {
                     "retention": f"{env.metrics_retention_days}d",
+                    "externalLabels": labels,
                 }
             },
             "global": {
@@ -38,6 +43,7 @@ def generate_environment_configs(env: Environment) -> Path:
             yaml.safe_dump(prom_values), encoding="utf-8"
         )
 
+    # Elasticsearch / OpenSearch
     if env.enable_elk:
         es_values = {
             "persistence": {"enabled": True, "size": "50Gi"},
@@ -47,6 +53,7 @@ def generate_environment_configs(env: Environment) -> Path:
             yaml.safe_dump(es_values), encoding="utf-8"
         )
 
+    # ArgoCD
     if env.enable_argocd:
         argocd_values = {
             "server": {
