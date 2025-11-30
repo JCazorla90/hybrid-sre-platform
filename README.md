@@ -1,89 +1,306 @@
 # Hybrid SRE Platform
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+> Plataforma de referencia para montar un **entorno híbrido SRE / SecOps** (on‑prem + multi‑cloud)
+> con foco en **persistencia de datos, resiliencia, observabilidad y seguridad**.
+
 Autor: **Jose Cazorla**
 
-Plataforma de referencia para montar entornos SRE / SecOps híbridos (on-prem + multi-cloud) con:
+---
 
-- Panel web (Django) para gestionar entornos y cuentas cloud.
-- Despliegue automatizado de:
+## 🔍 Visión general
+
+**Hybrid SRE Platform** es un ejemplo de arquitectura técnica y código base para:
+
+- Gestionar entornos **on‑prem (bare‑metal, VMware/Proxmox)** y **cloud (AWS/Azure/GCP)**.
+- Desplegar una **plataforma de observabilidad y seguridad** con:
   - Prometheus + Grafana
-  - Apache SkyWalking (extensible)
-  - ELK / OpenSearch
-  - Wazuh (extensible)
-  - ArgoCD (GitOps)
-- Scripts base para conectar con:
-  - AWS
-  - Azure
-  - Google Cloud
-  - VMware
-  - Proxmox
-- Autodiscovery de Kubernetes y cloud (esqueleto en Python).
-- Etiquetado de recursos por entorno/proveedor/cuenta para observabilidad.
+  - Apache SkyWalking (APM, trazas, topología)
+  - ELK / OpenSearch (logs)
+  - Wazuh (HIDS / SIEM ligero)
+  - Ceph (almacenamiento distribuido)
+- Exponer un **panel web ligero (Django)** para:
+  - Gestionar entornos y cuentas cloud.
+  - Visualizar paneles de seguridad, herramientas y proyectos de IaC.
+- Ofrecer una **demo visual estática (`/docs`)** pensada para GitHub Pages, que simula:
+  - Dashboard global de salud.
+  - Gestión de entornos y cuentas cloud.
+  - Panel de Seguridad (Wazuh / ELK / Grafana / SkyWalking).
+  - Panel de Admin tools (pool de herramientas + repos GitHub).
+  - Panel de IaC / Terraform (estado de escaneos de seguridad).
 
-> ⚠️ Este repositorio es un **esqueleto funcional**: listo para levantar el panel, generar configs base
-> y orquestar despliegues, pero tendrás que completar la parte de IaC específica por proveedor (Terraform, etc.).
+La idea es que puedas usar este repo como:
 
-Repo: https://github.com/JCazorla90/hybrid-sre-platform
+- **Material de arquitectura** (entrevistas, charlas, documentación interna).
+- **Base para un PoC real** en tu laboratorio (Docker Compose, k8s single cluster, etc.).
+- **Plantilla** para montar tu propia plataforma SRE / SecOps híbrida.
 
-## Estructura
+---
+
+## 🧱 Componentes principales
+
+### 1. Panel web (Django)
+
+Ruta: `backend/`
+
+- App `platform_app`:
+  - Lista de **entornos** (on‑prem, AWS, etc.).
+  - Lista de **cuentas cloud**.
+  - **Panel de Seguridad**: enlaces configurables a Wazuh, ELK/Kibana, Grafana.
+  - **Admin tools**:
+    - Pool de herramientas (Mist, StackStorm, Wazuh, SkyWalking, ELK, Grafana, ArgoCD, Ceph, GitHub…).
+    - Integración ligera con **GitHub API** para listar repos públicos/privados (si se configura token).
+  - **IaC / Terraform**:
+    - Vista conceptual para proyectos Terraform.
+    - Estado de escaneos de seguridad (Crit/High/Medium).
+    - Integración pensada con tfsec / checkov / terrascan.
+
+### 2. Demo visual (GitHub Pages)
+
+Ruta: `docs/`
+
+- `index.html` + `css/style.css` + `js/app-sim.js`
+- Simula una app SPA con varias vistas:
+
+  - **Dashboard**
+  - **Entornos**
+  - **Cuentas cloud**
+  - **Despliegues**
+  - **Seguridad**
+    - Wazuh, ELK, Grafana
+    - Iframe de demo pública de **Apache SkyWalking**
+  - **IaC / Terraform**
+    - Proyectos Terraform mock
+    - Botón para **simular escaneos** (datos random para la demo)
+  - **Admin tools**
+    - Pool de herramientas
+    - Panel para listar repos GitHub llamando a la API pública
+
+Ideal para enseñar el concepto sin necesidad de levantar todo el backend.
+
+### 3. Stacks de observabilidad y seguridad
+
+Ruta: `stacks/`
+
+- `docker-compose-full/`
+  - `docker-compose.yml` con:
+    - Prometheus
+    - Grafana
+    - OpenSearch / Elasticsearch + Kibana (según variante)
+    - Exporters básicos
+  - Pensado para **entorno de laboratorio**.
+
+- `k8s-single-cluster/`
+  - `namespaces.yaml`
+  - `helmfile.yaml`
+  - `values-*.yaml` para:
+    - Prometheus / kube-prometheus-stack
+    - Grafana
+    - Elasticsearch / Kibana
+    - ArgoCD
+    - SkyWalking
+    - Wazuh
+  - Te da un punto de partida para un **cluster de observabilidad único**.
+
+### 4. IaC y scripts
+
+Ruta: `infra/` y `scripts/`
+
+- `infra/k8s/helmfile.yaml`
+  - Despliegue centralizado vía Helmfile para el cluster de observabilidad.
+
+- Scripts:
+  - `infra/scripts/bootstrap-kind.sh`
+    - Crear un cluster **kind** local para pruebas.
+  - `infra/scripts/deploy-platform.sh`
+    - Ejemplo de flujo para desplegar la plataforma al cluster.
+  - `scripts/tfscan.sh`
+    - Wrapper de ejemplo para lanzar **tfsec** y **checkov** sobre un directorio de Terraform.
+    - Punto de entrada para integrarlo en CI/CD o StackStorm.
+
+---
+
+## 🧬 Flujos de alto nivel
+
+### Flujo 1 – Observabilidad y seguridad
+
+1. **Infraestructura híbrida**:
+   - On‑prem (bare‑metal / VMware / Proxmox).
+   - Cloud (AWS/Azure/GCP).
+2. **Mist** orquesta VMs / nodos / clusters K8s (conceptual, no incluido en el código).
+3. En los clusters:
+   - Se despliegan:
+     - Prometheus + Grafana
+     - SkyWalking
+     - ELK / OpenSearch
+     - Wazuh (agentes / DaemonSet)
+4. Logs y métricas:
+   - Logs de:
+     - Apps, K8s, sistemas, Mist, StackStorm, Wazuh…
+   - Métricas de:
+     - K8s, nodes, services.
+5. El **panel Django** actúa como “single pane of glass”:
+   - Dashboards de Seguridad (Wazuh/ELK/Grafana/SkyWalking).
+   - Vistas de IaC y Admin tools.
+
+### Flujo 2 – IaC + seguridad (Terraform + tfsec/checkov)
+
+1. Definir infraestructura en Terraform (por proveedor / módulo / entorno).
+2. Repos Git en GitHub (o tu SCM favorito).
+3. Pipeline CI/CD (GitHub Actions, GitLab CI, etc.):
+   - `terraform fmt` / `terraform validate`
+   - `tfsec` y/o `checkov`
+   - Publicación de resultados:
+     - Como artefactos de CI.
+     - Como JSON para que los consuma el backend (futuro).
+4. El panel **IaC / Terraform**:
+   - Muestra estado de proyectos y severidad de findings.
+   - Permite simular el flujo en la demo `/docs` con datos mock.
+
+---
+
+## 🗂️ Estructura del repositorio
 
 ```text
-backend/          # Django + API + panel web
-infra/            # IaC, Kubernetes, Helmfile, scripts por proveedor
-docs/             # Demo visual que simula la aplicación (para GitHub Pages)
-.github/          # Workflows CI/CD
-docker-compose.yml
-.env.example
+hybrid-sre-platform/
+  README.md
+  .env.example            # Variables de entorno base para backend / stacks
+  docker-compose.yml      # Compose root (puente hacia stacks/docker-compose-full)
+  backend/                # Django + panel web SRE/SecOps
+    hybrid_sre/
+    platform_app/
+    templates/
+    requirements.txt
+    Dockerfile
+  docs/                   # Demo SPA estática (pensada para GitHub Pages)
+    index.html
+    css/
+    js/
+  stacks/                 # Stacks de observabilidad / seguridad
+    docker-compose-full/
+    k8s-single-cluster/
+  infra/                  # Infra genérica / scripts k8s
+    k8s/
+    scripts/
+  scripts/                # Scripts utilitarios (tfscan, etc.)
+  .github/                # Workflows CI/CD
 ```
 
-## Quickstart (modo local con Docker Compose)
+---
+
+## 🚀 Quickstart
+
+### 1. Backend (Django) en local
 
 Requisitos:
 
-- Docker y Docker Compose
-- (Opcional) kind + kubectl + helm + helmfile para pruebas de despliegue
+- Python 3.10+
+- virtualenv (opcional pero recomendado)
+- Docker (si quieres levantar también los stacks)
 
 ```bash
-git clone https://github.com/JCazorla90/hybrid-sre-platform.git
-cd hybrid-sre-platform
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # en Windows: .venv\Scripts\activate
 
-cp .env.example .env
-docker compose up -d --build
+pip install -r requirements.txt
 
-# Panel web:
-# http://localhost:8000
+# Migraciones iniciales
+python manage.py migrate
+
+# Crear superusuario si lo necesitas
+python manage.py createsuperuser
+
+# Lanzar el servidor de desarrollo
+python manage.py runserver
 ```
 
-Una vez dentro del panel:
+La app quedará disponible en:
 
-1. Crea una cuenta cloud (AWS/Azure/GCP/VMware/Proxmox o local).
-2. Crea un entorno asociado a esa cuenta (dev / pre / prod / lab…).
-3. Lanza un despliegue desde la vista del entorno.
+- `http://localhost:8000/`
 
-El backend:
+### 2. Stacks de observabilidad con Docker Compose
 
-- Genera ficheros de configuración para las herramientas (Prometheus, ELK, ArgoCD, etc.).
-- Llama a los scripts correspondientes en `infra/` según el proveedor y tipo de entorno.
+```bash
+cd stacks/docker-compose-full
+docker compose up -d
+```
 
-## Docs / Demo visual
+Servicios típicos:
 
-El directorio `docs/` contiene una demo estática que **simula la propia aplicación**:
+- Prometheus: `http://localhost:9090`
+- Grafana: `http://localhost:3000`
+- Kibana / Dashboards: `http://localhost:5601` (según stack)
+- Otros servicios según el `docker-compose.yml`.
 
-- Vista de dashboard
-- Listado de entornos
-- Detalle de entorno y despliegues
+### 3. Demo visual en GitHub Pages
 
-Pensada para publicarse en GitHub Pages:
+1. Publica la carpeta `docs/`:
 
-- Settings → Pages → Deploy from branch → `main` → `/docs`.
+   - GitHub → Settings → Pages → Deploy from branch
+   - Branch: `main`
+   - Folder: `/docs`
 
-## CI/CD
+2. Accede a la URL que te genere GitHub Pages:
 
-En `.github/workflows/` se incluye:
+   - Verás la demo SPA con los distintos paneles:
+     - Dashboard
+     - Entornos
+     - Cuentas cloud
+     - Despliegues
+     - Seguridad
+     - IaC / Terraform
+     - Admin tools
 
-- `backend-ci.yml`: pipeline básico de CI para el backend (checks Django).
-- `backend-docker-build.yml`: build y push de imagen Docker del backend a GHCR (plantilla).
+---
 
-## Licencia
+## 🧪 Seguridad y calidad
 
-Puedes usar este esqueleto como base para tus propios proyectos.
+Aunque este repo es principalmente una **demo de arquitectura**, se han tenido en cuenta buenas prácticas:
+
+- Estilo Python con **black**.
+- Se recomienda usar:
+  - **bandit** para escanear el código Python.
+  - **tfsec / checkov** para los módulos Terraform.
+- Separación clara entre:
+  - Código de app (`backend/`).
+  - Infraestructura (`infra/`, `stacks/`).
+  - Demo puramente estática (`docs/`).
+
+Ejemplo de ejecución de `tfscan.sh`:
+
+```bash
+./scripts/tfscan.sh path/a/tu/terraform
+```
+
+---
+
+## 🧭 Roadmap / ideas futuras
+
+- Persistir en base de datos:
+
+  - Proyectos Terraform y resultados de escaneos.
+  - Enlaces por entorno a dashboards reales (Grafana, Kibana, Wazuh, SkyWalking).
+
+- Integración real con:
+
+  - Mist (API).
+  - StackStorm (packs para IaC, remediación, etc.).
+  - ArgoCD (GitOps para las apps y la propia plataforma).
+
+- Añadir:
+
+  - Soporte multi‑tenant real en el panel web.
+  - Modelado de SLOs y SLIs por servicio.
+
+---
+
+## 📄 Licencia
+
+Este proyecto se publica bajo licencia **MIT**.
+
+Consulta el fichero [`LICENSE`](./LICENSE) para más detalles.
