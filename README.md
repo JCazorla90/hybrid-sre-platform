@@ -33,11 +33,6 @@ Autor: **Jose Cazorla**
   - Panel de Admin tools (pool de herramientas + repos GitHub).
   - Panel de IaC / Terraform (estado de escaneos de seguridad).
 
-La idea es que puedas usar este repo como:
-
-- **Material de arquitectura** (entrevistas, charlas, documentación interna).
-- **Base para un PoC real** en tu laboratorio (Docker Compose, k8s single cluster, etc.).
-- **Plantilla** para montar tu propia plataforma SRE / SecOps híbrida.
 
 ---
 
@@ -58,7 +53,32 @@ Ruta: `backend/`
     - Vista conceptual para proyectos Terraform.
     - Estado de escaneos de seguridad (Crit/High/Medium).
     - Integración pensada con tfsec / checkov / terrascan.
+   
+## 🧩 Mapa de servicios e infraestructura (laboratorio)
 
+Este diagrama resume la granularidad de componentes que se modelan o se despliegan
+(en demo o en diseño):
+
+| Capa                    | Servicio / herramienta         | Rol principal                                           | Ejemplo de despliegue                        |
+|-------------------------|--------------------------------|--------------------------------------------------------|----------------------------------------------|
+| Presentación / CMDB     | Django Hybrid SRE Platform     | UI de CMDB + panel SRE/SecOps                         | `backend/`, expuesto como `https://sre.local` |
+| Datos CMDB              | DB Django (SQLite / Postgres)  | Inventario de entornos, cuentas, clústeres, IaC       | Contenedor DB / servicio gestionado          |
+| Automatización          | StackStorm (diseño)            | Runbooks, remediación, orquestación de IaC            | K8s o VM dedicada                             |
+| GitOps / CI             | ArgoCD / GitHub Actions        | Deploy continuo, sync de manifiestos / charts         | `stacks/k8s-single-cluster` + `.github/`     |
+| IaC                     | Terraform + Ansible            | Provisión infra (cloud + on-prem) y configuración     | Carpetas `infra/` + `scripts/tfscan.sh`      |
+| Seguridad infra         | Wazuh                          | HIDS, FIM, correlación básica                         | Agentes en VMs, nodos K8s, sidecars          |
+| Observabilidad métricas | Prometheus + exporters         | Métricas técnicas, SLIs                               | `stacks/docker-compose-full` / Helm          |
+| Observabilidad dashboards | Grafana                     | Visores SRE, paneles negocio / ejecutivos             | `stacks/docker-compose-full` / Helm          |
+| Logs                    | ELK / OpenSearch + Beats       | Centralización de logs de apps, K8s, infra            | Docker Compose / Helm                        |
+| APM / trazas            | Apache SkyWalking              | Trazas, topología de servicios, profiling             | Helm en cluster de observabilidad            |
+| Almacenamiento datos    | Ceph (diseño)                  | Volúmenes replicados / object storage on-prem         | Cluster Ceph dedicado                        |
+| Infra on-prem           | Bare-metal + VMware/Proxmox    | Hosts físicos, hipervisores, VMs                      | Modelado como “Lab on-prem”                  |
+| Infra cloud             | AWS / Azure / GCP              | Cuentas cloud, VPC/VNet, EKS/AKS/GKE, servicios       | Modelado como “Prod AWS”, “Pre Azure”, etc.  |
+
+> En la demo UI (`/docs`) se representa principalmente el nivel **Entorno / Proveedor / Clúster**,
+> pero el diseño está pensado para bajar hasta **servicio / recurso concreto** si se extiende el backend.
+
+---
 ### 2. Demo visual (GitHub Pages)
 
 Ruta: `docs/`
