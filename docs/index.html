@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Hybrid SRE Platform – Demo UI</title>
+  <title>Hybrid SRE Platform – Demo interactiva</title>
   <link rel="stylesheet" href="css/style.css" />
   <script defer src="js/app-sim.js"></script>
 </head>
@@ -27,116 +27,122 @@
         <button class="nav-item" data-view="environments">Entornos</button>
         <button class="nav-item" data-view="cloud-accounts">Cuentas cloud</button>
         <button class="nav-item" data-view="deployments">Despliegues</button>
+        <button class="nav-item" data-view="settings">Ajustes demo</button>
       </nav>
     </aside>
 
     <main class="content">
       <!-- Dashboard -->
       <section id="view-dashboard" class="view active">
-        <div class="card">
-          <h2>Dashboard</h2>
-          <p>Resumen de estado de tus entornos híbridos y multi-cloud.</p>
-          <div class="grid-3">
-            <div class="mini-card">
-              <div class="mini-label">Entornos</div>
-              <div class="mini-value">4</div>
-              <div class="mini-desc">dev, pre, prod, lab</div>
-            </div>
-            <div class="mini-card">
-              <div class="mini-label">Cuentas cloud</div>
-              <div class="mini-value">3</div>
-              <div class="mini-desc">AWS, Azure, GCP</div>
-            </div>
-            <div class="mini-card">
-              <div class="mini-label">Último despliegue</div>
-              <div class="mini-value ok">Éxito</div>
-              <div class="mini-desc">prod-aws · hace 5 min</div>
-            </div>
+        <div class="card card-header">
+          <div>
+            <h2>Dashboard híbrido</h2>
+            <p>Vista general de los entornos gestionados por la plataforma.</p>
+          </div>
+          <div class="toolbar">
+            <label class="toolbar-field">
+              Entorno:
+              <select id="dashboard-env-select"></select>
+            </label>
+            <label class="toolbar-field">
+              Proveedor:
+              <select id="dashboard-provider-select">
+                <option value="all">Todos</option>
+                <option value="AWS">AWS</option>
+                <option value="Azure">Azure</option>
+                <option value="GCP">GCP</option>
+                <option value="Local">On‑prem / Local</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="mini-card" id="card-env-count">
+            <div class="mini-label">Entornos</div>
+            <div class="mini-value">–</div>
+            <div class="mini-desc">Filtrados según el proveedor seleccionado</div>
+          </div>
+          <div class="mini-card" id="card-cloud-count">
+            <div class="mini-label">Cuentas cloud</div>
+            <div class="mini-value">–</div>
+            <div class="mini-desc">AWS · Azure · GCP · Local</div>
+          </div>
+          <div class="mini-card" id="card-last-deploy">
+            <div class="mini-label">Último despliegue</div>
+            <div class="mini-value">–</div>
+            <div class="mini-desc">Estado y entorno</div>
           </div>
         </div>
 
         <div class="card">
-          <h3>Entornos recientes</h3>
-          <table>
-            <tr>
-              <th>Nombre</th><th>Slug</th><th>Proveedor</th><th>Cluster</th><th>Estado</th>
-            </tr>
-            <tr>
-              <td><a href="#" class="link-env" data-env="prod-aws">Producción AWS</a></td>
-              <td>prod-aws</td>
-              <td>AWS</td>
-              <td>EKS gestionado</td>
-              <td><span class="pill pill-ok">Healthy</span></td>
-            </tr>
-            <tr>
-              <td><a href="#" class="link-env" data-env="pre-azure">Preproducción Azure</a></td>
-              <td>pre-azure</td>
-              <td>Azure</td>
-              <td>AKS gestionado</td>
-              <td><span class="pill pill-ok">Healthy</span></td>
-            </tr>
-            <tr>
-              <td><a href="#" class="link-env" data-env="lab-kind">Lab on-prem</a></td>
-              <td>lab-kind</td>
-              <td>Local</td>
-              <td>kind (3 nodos)</td>
-              <td><span class="pill pill-warn">Cambios recientes</span></td>
-            </tr>
+          <h3>Estado por entorno</h3>
+          <table id="dashboard-env-table">
+            <thead>
+              <tr>
+                <th>Entorno</th><th>Proveedor</th><th>Cluster</th><th>Estado</th><th>Último despliegue</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
           </table>
         </div>
       </section>
 
       <!-- Entornos -->
       <section id="view-environments" class="view">
+        <div class="card card-header">
+          <div>
+            <h2>Entornos</h2>
+            <p>Gestión simulada de entornos híbridos / multi‑cloud.</p>
+          </div>
+          <div class="toolbar">
+            <label class="toolbar-field">
+              Proveedor:
+              <select id="env-filter-provider">
+                <option value="all">Todos</option>
+                <option value="AWS">AWS</option>
+                <option value="Azure">Azure</option>
+                <option value="GCP">GCP</option>
+                <option value="Local">On‑prem / Local</option>
+              </select>
+            </label>
+            <label class="toolbar-field">
+              Buscar:
+              <input type="text" id="env-filter-search" placeholder="prod, dev, lab..." />
+            </label>
+            <button class="btn-primary" id="btn-env-new">+ Simular nuevo entorno</button>
+          </div>
+        </div>
+
         <div class="card">
-          <h2>Entornos</h2>
-          <p>Simulación de cómo se ve el listado de entornos en la aplicación real.</p>
           <table>
-            <tr>
-              <th>Nombre</th><th>Slug</th><th>Proveedor</th><th>Cluster</th><th>Retención logs</th><th>Acciones</th>
-            </tr>
-            <tr>
-              <td>Producción AWS</td>
-              <td>prod-aws</td>
-              <td>AWS</td>
-              <td>EKS (3 AZs)</td>
-              <td>30 días</td>
-              <td><button class="btn-primary btn-small" data-env="prod-aws">Ver detalle</button></td>
-            </tr>
-            <tr>
-              <td>Preproducción Azure</td>
-              <td>pre-azure</td>
-              <td>Azure</td>
-              <td>AKS</td>
-              <td>15 días</td>
-              <td><button class="btn-primary btn-small" data-env="pre-azure">Ver detalle</button></td>
-            </tr>
-            <tr>
-              <td>Desarrollo GCP</td>
-              <td>dev-gcp</td>
-              <td>GCP</td>
-              <td>GKE</td>
-              <td>7 días</td>
-              <td><button class="btn-primary btn-small" data-env="dev-gcp">Ver detalle</button></td>
-            </tr>
-            <tr>
-              <td>Lab on-prem</td>
-              <td>lab-kind</td>
-              <td>Local</td>
-              <td>kind</td>
-              <td>7 días</td>
-              <td><button class="btn-primary btn-small" data-env="lab-kind">Ver detalle</button></td>
-            </tr>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Slug</th>
+                <th>Proveedor</th>
+                <th>Cluster</th>
+                <th>Retención logs</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="env-table-body">
+              <!-- Rellenado desde JS -->
+            </tbody>
           </table>
         </div>
 
-        <div class="card" id="env-detail-sim">
-          <h3>Detalle de entorno (simulado)</h3>
-          <p>Selecciona un entorno en la tabla para ver su configuración simulada.</p>
+        <div class="card" id="env-detail-card">
+          <h3>Detalle de entorno</h3>
+          <p class="muted" id="env-detail-empty">Selecciona un entorno de la tabla para ver su configuración y lanzar un despliegue simulado.</p>
           <div class="env-detail-body hidden">
             <p><strong>Entorno:</strong> <span id="env-name"></span> (<code id="env-slug"></code>)</p>
             <p><strong>Proveedor:</strong> <span id="env-provider"></span> · <strong>Cluster:</strong> <span id="env-cluster"></span></p>
             <p><strong>Componentes:</strong> <span id="env-components"></span></p>
+            <p><strong>Retención:</strong> <span id="env-retention"></span></p>
+            <div class="detail-actions">
+              <button class="btn-primary" id="btn-simulate-deploy">Simular despliegue</button>
+            </div>
             <h4>Despliegues recientes</h4>
             <ul id="env-deployments"></ul>
           </div>
@@ -145,69 +151,135 @@
 
       <!-- Cuentas cloud -->
       <section id="view-cloud-accounts" class="view">
+        <div class="card card-header">
+          <div>
+            <h2>Cuentas cloud</h2>
+            <p>Representación de cómo se gestionan las cuentas cloud en el panel real.</p>
+          </div>
+          <div class="toolbar">
+            <span class="muted small">Demo: los datos son de ejemplo, pero puedes filtrar por proveedor.</span>
+          </div>
+        </div>
+
         <div class="card">
-          <h2>Cuentas cloud</h2>
-          <p>Representación de cómo se gestionan las cuentas cloud en el panel.</p>
+          <div class="toolbar">
+            <label class="toolbar-field">
+              Proveedor:
+              <select id="accounts-filter-provider">
+                <option value="all">Todos</option>
+                <option value="AWS">AWS</option>
+                <option value="Azure">Azure</option>
+                <option value="GCP">GCP</option>
+              </select>
+            </label>
+          </div>
           <table>
-            <tr>
-              <th>Nombre</th><th>Proveedor</th><th>Account/ID</th><th>Región por defecto</th>
-            </tr>
-            <tr>
-              <td>aws-prod</td>
-              <td>AWS</td>
-              <td>123456789012</td>
-              <td>eu-west-1</td>
-            </tr>
-            <tr>
-              <td>azure-main</td>
-              <td>Azure</td>
-              <td>xxxx-azure-subscription-id</td>
-              <td>westeurope</td>
-            </tr>
-            <tr>
-              <td>gcp-dev</td>
-              <td>GCP</td>
-              <td>project-id-dev</td>
-              <td>europe-west1</td>
-            </tr>
+            <thead>
+              <tr>
+                <th>Nombre</th><th>Proveedor</th><th>Account/ID</th><th>Región por defecto</th>
+              </tr>
+            </thead>
+            <tbody id="accounts-table-body"></tbody>
           </table>
         </div>
       </section>
 
       <!-- Despliegues -->
       <section id="view-deployments" class="view">
+        <div class="card card-header">
+          <div>
+            <h2>Histórico de despliegues</h2>
+            <p>Lista simulada de ejecuciones, sincronizada con los despliegues que lances en la demo.</p>
+          </div>
+          <div class="toolbar">
+            <button class="btn-secondary" id="btn-reset-demo">Reset demo</button>
+          </div>
+        </div>
+
         <div class="card">
-          <h2>Histórico de despliegues</h2>
-          <p>Lista simulada de ejecuciones como se vería en la UI real.</p>
           <table>
-            <tr>
-              <th>Entorno</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Log (resumen)</th>
-            </tr>
-            <tr>
-              <td>prod-aws</td>
-              <td><span class="pill pill-ok">Éxito</span></td>
-              <td>2025-11-30 10:02</td>
-              <td>2025-11-30 10:05</td>
-              <td><code>[+] Configs generadas · helmfile sync OK</code></td>
-            </tr>
-            <tr>
-              <td>pre-azure</td>
-              <td><span class="pill pill-ok">Éxito</span></td>
-              <td>2025-11-29 18:20</td>
-              <td>2025-11-29 18:23</td>
-              <td><code>AKS actualizado · Prometheus/Grafana/ELK up</code></td>
-            </tr>
-            <tr>
-              <td>lab-kind</td>
-              <td><span class="pill pill-warn">Fallo</span></td>
-              <td>2025-11-29 12:10</td>
-              <td>2025-11-29 12:11</td>
-              <td><code>kind cluster no accesible · timeout helmfile</code></td>
-            </tr>
+            <thead>
+              <tr>
+                <th>Entorno</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Log (resumen)</th>
+              </tr>
+            </thead>
+            <tbody id="deployments-table-body"></tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- Ajustes demo -->
+      <section id="view-settings" class="view">
+        <div class="card">
+          <h2>Ajustes de la demo</h2>
+          <p>Estos cambios solo afectan a la demo en /docs, no a la aplicación real.</p>
+          <div class="settings-grid">
+            <div>
+              <h3>Modo visual</h3>
+              <label class="switch">
+                <input type="checkbox" id="toggle-high-contrast">
+                <span class="slider"></span>
+              </label>
+              <span class="switch-label">Modo alto contraste</span>
+              <p class="muted small">Ajusta colores para entornos con mucha luz o proyectores.</p>
+            </div>
+            <div>
+              <h3>Datos ficticios</h3>
+              <button class="btn-secondary" id="btn-demo-randomize">Randomizar estados</button>
+              <p class="muted small">Cambia los estados de los entornos para simular incidencias.</p>
+            </div>
+          </div>
         </div>
       </section>
     </main>
   </div>
+
+  <!-- Modal: crear entorno simulado -->
+  <div id="env-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Simular nuevo entorno</h3>
+      <p class="muted small">Esto solo afecta a la demo, ideal para enseñar cómo se ampliaría la plataforma.</p>
+      <form id="env-modal-form">
+        <div class="form-row">
+          <label>Nombre del entorno</label>
+          <input type="text" id="modal-env-name" required placeholder="Ej. QA AWS" />
+        </div>
+        <div class="form-row">
+          <label>Slug</label>
+          <input type="text" id="modal-env-slug" required placeholder="qa-aws" />
+        </div>
+        <div class="form-row">
+          <label>Proveedor</label>
+          <select id="modal-env-provider" required>
+            <option value="AWS">AWS</option>
+            <option value="Azure">Azure</option>
+            <option value="GCP">GCP</option>
+            <option value="Local">Local / On‑prem</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Tipo de cluster</label>
+          <select id="modal-env-cluster">
+            <option value="EKS">EKS gestionado</option>
+            <option value="AKS">AKS gestionado</option>
+            <option value="GKE">GKE gestionado</option>
+            <option value="kind">kind (lab)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Retención de logs (días)</label>
+          <input type="number" id="modal-env-retention" min="1" max="365" value="7" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="env-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn-primary">Crear en demo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast para feedback -->
+  <div id="toast-container"></div>
 </body>
 </html>
