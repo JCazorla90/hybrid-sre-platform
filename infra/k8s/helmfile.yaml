@@ -1,0 +1,51 @@
+helmDefaults:
+  wait: true
+  timeout: 600
+  atomic: true
+
+repositories:
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
+  - name: elastic
+    url: https://helm.elastic.co
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+
+environments:
+  default: {}
+
+releases:
+  - name: prom-stack
+    namespace: observability
+    chart: prometheus-community/kube-prometheus-stack
+    values:
+      - ./charts/platform-observability/values-prometheus-base.yaml
+      - ./environments/{{ .Environment.Name }}/values-prometheus.yaml
+
+  - name: grafana
+    namespace: observability
+    chart: grafana/grafana
+    values:
+      - ./charts/platform-observability/values-grafana-base.yaml
+
+  - name: elasticsearch
+    namespace: logging
+    chart: elastic/elasticsearch
+    values:
+      - ./charts/platform-logging/values-elasticsearch-base.yaml
+      - ./environments/{{ .Environment.Name }}/values-elasticsearch.yaml
+
+  - name: kibana
+    namespace: logging
+    chart: elastic/kibana
+    values:
+      - ./charts/platform-logging/values-kibana-base.yaml
+
+  - name: argocd
+    namespace: argocd
+    chart: argo/argo-cd
+    values:
+      - ./charts/platform-argocd/values-argocd-base.yaml
+      - ./environments/{{ .Environment.Name }}/values-argocd.yaml

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Resumen</h2>
+  <p>Desde aquí puedes gestionar cuentas cloud, entornos y lanzar despliegues.</p>
+  <p>
+    <a class="btn" href="{% url 'cloudaccount_list' %}">Cuentas cloud</a>
+    <a class="btn" href="{% url 'env_list' %}">Entornos</a>
+  </p>
+</div>
+
+<div class="card">
+  <h3>Últimos entornos creados</h3>
+  {% if envs %}
+  <table>
+    <tr>
+      <th>Nombre</th><th>Proveedor</th><th>Cluster</th><th>Creado</th>
+    </tr>
+    {% for e in envs %}
+    <tr>
+      <td><a href="{% url 'env_detail' slug=e.slug %}">{{ e.name }}</a></td>
+      <td>{{ e.cloud_account.get_provider_display|default:"local" }}</td>
+      <td>{{ e.get_cluster_type_display }}</td>
+      <td>{{ e.created_at }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p>No hay entornos aún.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Cuentas cloud</h3>
+  {% if accounts %}
+  <ul>
+    {% for a in accounts %}
+    <li>{{ a.get_provider_display }} – {{ a.name }} ({{ a.account_id }})</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No hay cuentas cloud aún.</p>
+  {% endif %}
+</div>
+{% endblock %}

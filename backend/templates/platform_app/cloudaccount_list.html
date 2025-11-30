@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Cuentas cloud</h2>
+  <p><a class="btn" href="{% url 'cloudaccount_new' %}">+ Nueva cuenta cloud</a></p>
+  {% if accounts %}
+  <table>
+    <tr>
+      <th>Nombre</th><th>Proveedor</th><th>Account/ID</th><th>Región por defecto</th>
+    </tr>
+    {% for a in accounts %}
+    <tr>
+      <td>{{ a.name }}</td>
+      <td>{{ a.get_provider_display }}</td>
+      <td>{{ a.account_id }}</td>
+      <td>{{ a.default_region|default:"-" }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p>No hay cuentas cloud todavía.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hybrid SRE Platform – Demo</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="js/mermaid-init.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Hybrid SRE Platform</h1>
+    <p>Blueprint SRE / SecOps híbrido multi-cloud · Autor: Jose Cazorla</p>
+  </header>
+  <main>
+    <section>
+      <h2>Arquitectura global</h2>
+      <div class="mermaid">
+      graph LR
+        subgraph Users
+          U1[DevOps / SRE]
+          U2[SecOps]
+        end
+
+        subgraph Panel["Hybrid SRE Panel (Django)"]
+          UI[UI Web]
+          API[API REST]
+        end
+
+        subgraph Infra["Infra / IaC"]
+          Scripts[scripts providers (AWS/Azure/GCP/VMware/Proxmox)]
+          K8s[Helmfile + Charts]
+        end
+
+        subgraph Clouds["Providers"]
+          AWS[AWS]
+          AZ[Azure]
+          GCP[GCP]
+          VM[VMware]
+          PX[Proxmox]
+        end
+
+        U1 --> UI
+        U2 --> UI
+        UI --> API
+        API --> Infra
+        Infra --> Clouds
+      </div>
+    </section>
+
+    <section>
+      <h2>Flujo CI/CD GitOps</h2>
+      <div class="mermaid">
+      sequenceDiagram
+        participant Dev as Dev
+        participant GH as GitHub
+        participant CI as GitHub Actions
+        participant AR as ArgoCD
+        participant K8 as Cluster K8s
+
+        Dev->>GH: Push código
+        GH-->>CI: Dispara CI
+        CI->>CI: Tests + build imagen
+        CI->>GH: Actualiza manifests (tag imagen)
+        AR->>GH: Detecta cambios en manifests
+        AR->>K8: Sincroniza recursos
+        K8-->>AR: Estado despliegue
+      </div>
+    </section>
+
+    <section>
+      <h2>Características clave</h2>
+      <ul>
+        <li>Panel web para definir entornos y cuentas cloud.</li>
+        <li>Integración con múltiples proveedores: AWS / Azure / GCP / VMware / Proxmox.</li>
+        <li>Despliegue de:
+          <ul>
+            <li>Prometheus + Grafana</li>
+            <li>Apache SkyWalking (extensible)</li>
+            <li>ELK / OpenSearch</li>
+            <li>Wazuh (extensible)</li>
+            <li>ArgoCD</li>
+          </ul>
+        </li>
+        <li>Etiquetado de recursos por entorno, proveedor y cuenta.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Cómo arrancar el panel</h2>
+      <pre><code>git clone https://github.com/TU-USUARIO/hybrid-sre-platform.git
+cd hybrid-sre-platform
+cp .env.example .env
+docker compose up -d --build
+
+# Panel: http://localhost:8000
+</code></pre>
+    </section>
+  </main>
+  <footer>
+    <p>Hybrid SRE Platform · Autor: Jose Cazorla</p>
+  </footer>
+</body>
+</html>

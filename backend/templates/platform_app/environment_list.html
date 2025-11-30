@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Entornos</h2>
+  <p><a class="btn" href="{% url 'env_new' %}">+ Nuevo entorno</a></p>
+  {% if envs %}
+  <table>
+    <tr>
+      <th>Nombre</th><th>Slug</th><th>Proveedor</th><th>Tipo cluster</th><th>Creado</th>
+    </tr>
+    {% for e in envs %}
+    <tr>
+      <td><a href="{% url 'env_detail' slug=e.slug %}">{{ e.name }}</a></td>
+      <td>{{ e.slug }}</td>
+      <td>{{ e.cloud_account.get_provider_display|default:"local" }}</td>
+      <td>{{ e.get_cluster_type_display }}</td>
+      <td>{{ e.created_at }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p>No hay entornos definidos.</p>
+  {% endif %}
+</div>
+{% endblock %}

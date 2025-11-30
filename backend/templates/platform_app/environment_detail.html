@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Entorno: {{ env.name }} ({{ env.slug }})</h2>
+  <p>
+    Proveedor:
+    <span class="pill">
+      {{ env.cloud_account.get_provider_display|default:"local" }}
+    </span>
+    &nbsp; Cluster: {{ env.get_cluster_type_display }}
+  </p>
+  <p>
+    Logs: {{ env.log_retention_days }} días · Métricas: {{ env.metrics_retention_days }} días
+  </p>
+  <form method="post" action="{% url 'env_deploy' slug=env.slug %}">
+    {% csrf_token %}
+    <button class="btn" type="submit">Lanzar despliegue</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Histórico de despliegues</h3>
+  {% if deployments %}
+  <table>
+    <tr>
+      <th>ID</th><th>Estado</th><th>Creado</th><th>Inicio</th><th>Fin</th>
+    </tr>
+    {% for d in deployments %}
+    <tr>
+      <td>{{ d.id }}</td>
+      <td>{{ d.get_status_display }}</td>
+      <td>{{ d.created_at }}</td>
+      <td>{{ d.started_at|default:"-" }}</td>
+      <td>{{ d.finished_at|default:"-" }}</td>
+    </tr>
+    <tr>
+      <td colspan="5">
+        <pre style="white-space:pre-wrap; max-height:200px; overflow:auto; font-size:0.8rem;">{{ d.log|default:"(sin log)" }}</pre>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p>Este entorno todavía no se ha desplegado.</p>
+  {% endif %}
+</div>
+{% endblock %}
