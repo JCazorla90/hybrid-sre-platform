@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>IaC / Terraform</h2>
+  <p>
+    Panel conceptual para gestionar la infraestructura como código (IaC) y
+    conectar herramientas de seguridad como <code>tfsec</code>, <code>checkov</code> o
+    <code>terrascan</code>.
+  </p>
+  <p class="meta">
+    Esta vista es una demo: la lógica de escaneo se podría orquestar vía StackStorm,
+    GitHub Actions o pipelines específicos.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Pipeline propuesto</h3>
+  <ol class="small">
+    <li>Registrar un proyecto Terraform (repo Git, ruta, proveedor, entorno).</li>
+    <li>Al hacer commit / PR, lanzar un escaneo con tfsec / checkov.</li>
+    <li>Guardar los resultados agregados por severidad y módulo.</li>
+    <li>Mostrar el estado por entorno (prod / pre / dev) y detectar drift.</li>
+    <li>Opcional: generar “plantillas base” para nuevos entornos a partir de módulos aprobados.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h3>Proyectos Terraform (demo)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Proyecto</th>
+        <th>Proveedor</th>
+        <th>Entorno</th>
+        <th>Estado último escaneo</th>
+        <th>Crit / High / Med</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for proj in terraform_projects %}
+      <tr>
+        <td>{{ proj.name }}</td>
+        <td>{{ proj.provider }}</td>
+        <td><span class="badge">{{ proj.env }}</span></td>
+        <td>
+          {% if proj.last_scan_status == "passed" %}
+            <span class="badge badge-ok">OK</span>
+          {% elif proj.last_scan_status == "warnings" %}
+            <span class="badge badge-warn">Avisos</span>
+          {% else %}
+            <span class="badge badge-err">Fallo</span>
+          {% endif %}
+        </td>
+        <td class="small">
+          {{ proj.critical }} / {{ proj.high }} / {{ proj.medium }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>Herramientas de seguridad para Terraform</h3>
+  <ul class="small">
+    {% for tool in security_tools %}
+      <li>{{ tool }}</li>
+    {% endfor %}
+  </ul>
+  <p class="small muted">
+    Estas herramientas se pueden integrar vía contenedores (por ejemplo, en un job de GitHub Actions
+    o en un pack de StackStorm) y devolver los resultados en JSON para que este panel los consuma.
+  </p>
+</div>
+{% endblock %}

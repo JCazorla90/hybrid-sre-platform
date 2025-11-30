@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Admin tools</h2>
+  <p>
+    Panel centralizado para el equipo SRE/SecOps: pool de herramientas
+    y acceso rápido a repositorios GitHub relacionados con la plataforma.
+  </p>
+  <p class="meta">
+    Tip: en un despliegue real podrías enlazar aquí directamente tus dashboards,
+    runbooks, documentación y repos más críticos.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Pool de herramientas</h3>
+  <div class="tool-grid">
+    {% for tool in tools %}
+    <div class="tool-item">
+      <div class="tool-logo tool-logo-{{ tool.key|default:'default'|lower }}">
+        {{ tool.name|slice:":2" }}
+      </div>
+      <div class="tool-body">
+        <h4>{{ tool.name }}</h4>
+        <p class="small muted">{{ tool.description }}</p>
+        {% if tool.doc_url %}
+        <p class="small">
+          <a href="{{ tool.doc_url }}" target="_blank" rel="noopener noreferrer">
+            Ver documentación
+          </a>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card">
+  <h3>Repositorios GitHub</h3>
+  <p class="meta">
+    Consulta rápida de repos públicos (o privados si configuras <code>GITHUB_API_TOKEN</code>).
+    Por defecto usa el usuario <code>{{ github_user }}</code>.
+  </p>
+  <form method="get" class="github-form">
+    <label>
+      Usuario / organización
+      <input
+        type="text"
+        name="github_user"
+        value="{{ github_user }}"
+        placeholder="p.ej. JCazorla90"
+      />
+    </label>
+    <button type="submit" class="btn">Cargar repos</button>
+  </form>
+
+  {% if github_error %}
+    <p class="small" style="color:#fca5a5;">{{ github_error }}</p>
+  {% endif %}
+
+  {% if github_repos %}
+  <ul class="github-list">
+    {% for repo in github_repos %}
+    <li>
+      <a href="{{ repo.html_url }}" target="_blank" rel="noopener noreferrer">
+        {{ repo.full_name }}
+      </a>
+      {% if repo.description %}
+      <span class="small muted"> · {{ repo.description }}</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% elif not github_error %}
+  <p class="small muted">No se encontraron repos para este usuario (o el usuario no tiene repos públicos).</p>
+  {% endif %}
+</div>
+{% endblock %}

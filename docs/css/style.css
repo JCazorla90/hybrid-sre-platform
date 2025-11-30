@@ -621,3 +621,55 @@ code {
       }
     }
     
+    .iac-grid {
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:0.75rem;
+    }
+    .iac-card {
+      background:rgba(15,23,42,0.95);
+      border-radius:10px;
+      padding:0.8rem 1rem;
+      border:1px solid rgba(148,163,184,0.4);
+    }
+    #iac-projects-table {
+      width:100%;
+      border-collapse:collapse;
+      font-size:0.8rem;
+      margin-bottom:0.4rem;
+    }
+    #iac-projects-table th,
+    #iac-projects-table td {
+      padding:0.25rem 0.35rem;
+      border-bottom:1px solid rgba(30,64,175,0.4);
+    }
+    #iac-projects-table th {
+      text-align:left;
+      font-weight:500;
+      color:#cbd5f5;
+    }
+    .iac-summary {
+      display:flex;
+      flex-direction:column;
+      gap:0.4rem;
+      font-size:0.85rem;
+    }
+    .iac-summary .label {
+      font-size:0.75rem;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      color:#9ca3af;
+    }
+    .iac-summary .value {
+      font-size:1.4rem;
+      font-weight:600;
+    }
+    .iac-summary div:nth-child(1) .value { color:#fecaca; }
+    .iac-summary div:nth-child(2) .value { color:#fed7aa; }
+    .iac-summary div:nth-child(3) .value { color:#fde68a; }
+    @media (max-width: 900px) {
+      .iac-grid {
+        grid-template-columns:1fr;
+      }
+    }
+    
