@@ -546,7 +546,61 @@ function resetDemo() {
   window.location.reload();
 }
 
-// --- Bindeos de eventos globales ---
+
+    // --- GitHub repos panel (demo usando API pública) ---
+    async function loadGithubRepos(username) {
+      const list = $("#github-repos-list");
+      if (!list) return;
+      if (!username) {
+        list.innerHTML = '<li class="muted small">Introduce un usuario/organización válido.</li>';
+        return;
+      }
+      list.innerHTML = '<li class="muted small">Cargando repos de ' + username + '...</li>';
+      try {
+        const resp = await fetch(
+          "https://api.github.com/users/" +
+            encodeURIComponent(username) +
+            "/repos?sort=updated&per_page=10"
+        );
+        if (!resp.ok) {
+          list.innerHTML =
+            '<li class="muted small">No se pudo obtener la lista de repos (HTTP ' +
+            resp.status +
+            '). Puede deberse a límites de la API pública.</li>';
+          return;
+        }
+        const data = await resp.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          list.innerHTML =
+            '<li class="muted small">No se encontraron repos públicos para ' +
+            username +
+            '.</li>';
+          return;
+        }
+        list.innerHTML = "";
+        data.forEach((repo) => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = repo.html_url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.textContent = repo.full_name;
+          li.appendChild(a);
+          const span = document.createElement("span");
+          span.className = "muted small";
+          span.textContent = "  · " + (repo.description || "Sin descripción");
+          li.appendChild(span);
+          list.appendChild(li);
+        });
+      } catch (err) {
+        console.error(err);
+        list.innerHTML =
+          '<li class="muted small">Error de red al consultar la API de GitHub.</li>';
+      }
+    }
+    
+
+    // --- Bindeos de eventos globales ---
 function bindFiltersAndActions() {
   $("#dashboard-env-select")?.addEventListener("change", () => {
     renderDashboardTable();
