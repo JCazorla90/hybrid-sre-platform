@@ -1,0 +1,70 @@
+helmDefaults:
+  wait: true
+  timeout: 900
+  atomic: true
+
+repositories:
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+  - name: elastic
+    url: https://helm.elastic.co
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+  # Repositorios orientativos (ajusta URLs y versiones a tus necesidades)
+  - name: skywalking
+    url: https://apache.jfrog.io/artifactory/skywalking-helm
+  - name: wazuh
+    url: https://packages.wazuh.com/4.x/helm/
+
+environments:
+  lab:
+    values:
+      - values-lab.yaml
+
+releases:
+  # Observabilidad (Prometheus + Grafana)
+  - name: kube-prometheus-stack
+    namespace: observability
+    chart: prometheus-community/kube-prometheus-stack
+    version: 62.7.0
+    values:
+      - values-kps.yaml
+
+  # Elasticsearch + Kibana
+  - name: elasticsearch
+    namespace: logging
+    chart: elastic/elasticsearch
+    version: 8.5.1
+    values:
+      - values-elasticsearch.yaml
+
+  - name: kibana
+    namespace: logging
+    chart: elastic/kibana
+    version: 8.5.1
+    values:
+      - values-kibana.yaml
+
+  # ArgoCD
+  - name: argocd
+    namespace: argocd
+    chart: argo/argo-cd
+    version: 7.7.7
+    values:
+      - values-argocd.yaml
+
+  # SkyWalking (esqueleto - requiere ajustar chart/values)
+  - name: skywalking
+    namespace: observability
+    chart: skywalking/skywalking
+    installed: false  # cambia a true cuando ajustes values
+    values:
+      - values-skywalking.yaml
+
+  # Wazuh (esqueleto - requiere ajustar chart/values)
+  - name: wazuh
+    namespace: security
+    chart: wazuh/wazuh
+    installed: false  # cambia a true cuando ajustes values
+    values:
+      - values-wazuh.yaml

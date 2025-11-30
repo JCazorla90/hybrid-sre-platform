@@ -1,0 +1,9 @@
+# Valores orientativos para SkyWalking usando Elasticsearch como backend.
+oap:
+  storageType: elasticsearch
+  elasticsearch:
+    addresses:
+      - elasticsearch-master.logging.svc.cluster.local:9200
+ui:
+  service:
+    type: ClusterIP

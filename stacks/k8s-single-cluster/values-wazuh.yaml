@@ -1,0 +1,8 @@
+# Esqueleto de configuración para Wazuh en Kubernetes.
+# Revisa la documentación oficial de Wazuh para adaptar estos valores.
+wazuhIndexing:
+  enabled: false  # si ya usas un cluster dedicado de indexer
+wazuhManager:
+  replicas: 1
+  service:
+    type: ClusterIP

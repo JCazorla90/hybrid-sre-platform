@@ -1,0 +1,97 @@
+version: "3.9"
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - sre-net
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+    networks:
+      - sre-net
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - sre-net
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    networks:
+      - sre-net
+
+  skywalking-oap:
+    image: apache/skywalking-oap-server:10.0.1
+    environment:
+      - SW_STORAGE=elasticsearch
+      - SW_STORAGE_ES_CLUSTER_NODES=elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    ports:
+      - "11800:11800"   # gRPC
+      - "12800:12800"   # REST
+    networks:
+      - sre-net
+
+  skywalking-ui:
+    image: apache/skywalking-ui:10.0.1
+    environment:
+      - SW_OAP_ADDRESS=http://skywalking-oap:12800
+    depends_on:
+      - skywalking-oap
+    ports:
+      - "8080:8080"
+    networks:
+      - sre-net
+
+  wazuh-manager:
+    image: wazuh/wazuh-manager:4.7.2
+    environment:
+      - TZ=Europe/Madrid
+    ports:
+      - "1514:1514/udp"   # Syslog/agents
+      - "55000:55000"     # API
+    networks:
+      - sre-net
+
+networks:
+  sre-net:
+    driver: bridge
+
+volumes:
+  es_data:
+  grafana_data:

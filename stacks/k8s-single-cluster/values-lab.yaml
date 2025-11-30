@@ -1,0 +1,4 @@
+global:
+  labels:
+    environment: lab
+    owner: hybrid-sre-platform
